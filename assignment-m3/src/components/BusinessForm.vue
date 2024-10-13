@@ -55,6 +55,10 @@
     </div>
 
     <div>
+      <div v-if="errors.emails.groupedErrors.moreThan4Other">
+        <span>{{ getTranslation("errors.emails.morethan4other") }}</span>
+      </div>
+
       <div v-for="(email, index) in formData.emails" :key="index">
         <div>
           <p>
@@ -681,6 +685,7 @@ export default {
             empty: "This field is required and cannot be empty.",
             emails: {
               missingType: "You must select a type.",
+              morethan4other: "You can only select up to 4 emails with type 'Other'"
             },
             phone: {
               invalid: "The entered phone number is invalid.",
@@ -735,6 +740,19 @@ export default {
 
       this.errors[key].isVisible = this.errors[key].empty;
     },
+    validateOtherEmailsLimit() {
+      let email;
+      let emailsMarketAsOther = 0;
+
+      for (let i = 0; i < this.formData.emails.length; i++) {
+        email = this.formData.emails[i];
+        if (email.type == "other") {
+          emailsMarketAsOther++;
+        }
+      }
+
+      this.errors.emails.groupedErrors.moreThan4Other = emailsMarketAsOther > 4;
+    },
     validateEmailType(index) {
       let email = this.formData.emails[index];
       this.errors.emails.individualErrors[index].missingType = false;
@@ -742,6 +760,8 @@ export default {
       if (email.type == "") {
         this.errors.emails.individualErrors[index].missingType = true;
       }
+
+      this.validateOtherEmailsLimit();
     },
     validateEmail(index) {
       const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
