@@ -55,6 +55,9 @@
     </div>
 
     <div>
+      <div v-if="errors.emails.groupedErrors.noEntries">
+        <span>{{ getTranslation("errors.emails.noEntries") }}</span>
+      </div>
       <div v-if="errors.emails.groupedErrors.moreThan4Other">
         <span>{{ getTranslation("errors.emails.moreThan4Other") }}</span>
       </div>
@@ -140,6 +143,9 @@
     </div>
 
     <div>
+      <div v-if="errors.phones.groupedErrors.noEntries">
+        <span>{{ getTranslation("errors.phones.noEntries") }}</span>
+      </div>
       <div v-if="errors.phones.groupedErrors.moreThan3Other">
         <span>{{ getTranslation("errors.phones.moreThan3Other") }}</span>
       </div>
@@ -614,6 +620,7 @@ export default {
         },
         emails: {
           groupedErrors: {
+            noEntries: false,
             noPrimary: false,
             tooManyPrimary: false,
             moreThan4Other: false,
@@ -629,6 +636,7 @@ export default {
         },
         phones: {
           groupedErrors: {
+            noEntries: false,
             noPrimary: false,
             tooManyPrimary: false,
             moreThan3Other: false,
@@ -717,7 +725,7 @@ export default {
           },
           errors: {
             empty: "This field is required and cannot be empty.",
-            noEmails: "You must enter at least one email.",
+            noEntries: "You must enter at least one email.",
             emails: {
               missingType: "You must select a type.",
               moreThan4Other:
@@ -729,7 +737,7 @@ export default {
             },
             phones: {
               invalid: "The entered phone number is invalid.",
-              noPhones: "You must enter at least one phone number.",
+              noEntries: "You must enter at least one phone number.",
               moreThan3Other:
                 "You can only select up to 3 phones with type 'Other'",
               noPrimary:
@@ -754,10 +762,14 @@ export default {
         empty: false,
         invalid: false,
       });
+      this.errors.emails.groupedErrors.noEntries =
+        this.formData.emails.length == 0;
     },
     removeEmail(index) {
       this.formData.emails.splice(index, 1);
       this.errors.emails.individualErrors.splice(index, 1);
+      this.errors.emails.groupedErrors.noEntries =
+        this.formData.emails.length == 0;
     },
     addPhone() {
       this.formData.phones.push({
@@ -770,10 +782,14 @@ export default {
         empty: false,
         invalid: false,
       });
+      this.errors.phones.groupedErrors.noEntries =
+        this.formData.phones.length == 0;
     },
     removePhone(index) {
       this.formData.phones.splice(index, 1);
       this.errors.phones.individualErrors.splice(index, 1);
+      this.errors.phones.groupedErrors.noEntries =
+        this.formData.phones.length == 0;
     },
     // Validate if a field value is empty. Used only for required fields with no additional validation and fields on the first level of the formData object.
     validateRequired(key) {
@@ -786,6 +802,8 @@ export default {
       }
 
       this.errors[key].isVisible = this.errors[key].empty;
+
+      return this.errors[key].isVisible;
     },
     validatePrimaryEmail() {
       let email;
@@ -796,11 +814,15 @@ export default {
         if (email.primary) {
           primaryEmailsCount++;
         }
-
-        this.errors.emails.groupedErrors.noPrimary = primaryEmailsCount == 0;
-        this.errors.emails.groupedErrors.tooManyPrimary =
-          primaryEmailsCount > 1;
       }
+
+      this.errors.emails.groupedErrors.noPrimary = primaryEmailsCount == 0;
+      this.errors.emails.groupedErrors.tooManyPrimary = primaryEmailsCount > 1;
+
+      return (
+        this.errors.emails.groupedErrors.tooManyPrimary ||
+        this.errors.emails.groupedErrors.noPrimary
+      );
     },
     validateOtherEmailsLimit() {
       let email;
@@ -814,6 +836,8 @@ export default {
       }
 
       this.errors.emails.groupedErrors.moreThan4Other = emailsMarkedAsOther > 4;
+
+      return this.errors.emails.groupedErrors.moreThan4Other;
     },
     validateEmailType(index) {
       let email = this.formData.emails[index];
@@ -824,6 +848,8 @@ export default {
       }
 
       this.validateOtherEmailsLimit();
+
+      return this.errors.emails.individualErrors[index].missingType;
     },
     validateEmail(index) {
       const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -841,6 +867,8 @@ export default {
       this.errors.emails.individualErrors[index].isVisible =
         this.errors.emails.individualErrors[index].empty ||
         this.errors.emails.individualErrors[index].invalid;
+
+      return this.errors.emails.individualErrors[index].isVisible;
     },
     validatePrimaryPhone() {
       let phone;
@@ -851,11 +879,15 @@ export default {
         if (phone.primary) {
           primaryPhonesCount++;
         }
-
-        this.errors.phones.groupedErrors.noPrimary = primaryPhonesCount == 0;
-        this.errors.phones.groupedErrors.tooManyPrimary =
-          primaryPhonesCount > 1;
       }
+
+      this.errors.phones.groupedErrors.noPrimary = primaryPhonesCount == 0;
+      this.errors.phones.groupedErrors.tooManyPrimary = primaryPhonesCount > 1;
+
+      return (
+        this.errors.phones.groupedErrors.noPrimary ||
+        this.errors.phones.groupedErrors.tooManyPrimary
+      );
     },
     validateOtherPhonesLimit() {
       let phone;
@@ -869,6 +901,8 @@ export default {
       }
 
       this.errors.phones.groupedErrors.moreThan3Other = phonesMarkedAsOther > 3;
+
+      return this.errors.phones.groupedErrors.moreThan3Other;
     },
     validatePhoneType(index) {
       let phone = this.formData.phones[index];
@@ -879,6 +913,8 @@ export default {
       }
 
       this.validateOtherPhonesLimit();
+
+      return this.errors.phones.individualErrors[index].missingType;
     },
     // Validate a phone number to match the international standard for european phone numbers.
     validatePhoneNumber(index) {
@@ -897,6 +933,8 @@ export default {
       this.errors.phones.individualErrors[index].isVisible =
         this.errors.phones.individualErrors[index].empty ||
         this.errors.phones.individualErrors[index].invalid;
+
+      return this.errors.phones.individualErrors[index].isVisible;
     },
     // Given a translation key, return the translated string associated with it for the current language. Otherwise, return the key itself.
     getTranslation(key) {
@@ -915,24 +953,35 @@ export default {
       return translationObject;
     },
     validateWholeForm() {
-      this.validateRequired("firstName");
-      this.validateRequired("lastName");
-      this.validateRequired("birthDate");
+      let isInvalid = false;
+      isInvalid |= this.validateRequired("firstName");
+      isInvalid |= this.validateRequired("lastName");
+      isInvalid |= this.validateRequired("birthDate");
 
+      isInvalid |= this.errors.emails.groupedErrors.noEntries;
+      isInvalid |= this.validatePrimaryEmail();
       for (let i = 0; i < this.formData.emails.length; i++) {
-        this.validateEmailType(i);
-        this.validateEmail(i);
+        isInvalid |= this.validateEmailType(i);
+        isInvalid |= this.validateEmail(i);
       }
 
+      isInvalid |= this.errors.phones.groupedErrors.noEntries;
+      isInvalid |= this.validatePrimaryPhone();
       for (let i = 0; i < this.formData.phones.length; i++) {
-        this.validatePhoneType(i);
-        this.validatePhoneNumber(i);
+        isInvalid |= this.validatePhoneType(i);
+        isInvalid |= this.validatePhoneNumber(i);
       }
 
-      this.validateRequired("street");
-      this.validateRequired("zipCode");
-      this.validateRequired("city");
-      this.validateRequired("country");
+      isInvalid |= this.validateRequired("street");
+      isInvalid |= this.validateRequired("zipCode");
+      isInvalid |= this.validateRequired("city");
+      isInvalid |= this.validateRequired("country");
+
+      if (isInvalid) {
+        console.log("The form is invalid :(");
+      } else {
+        console.log("The form is valid :)");
+      }
     },
     printJsonInConsole() {
       this.validateWholeForm();
