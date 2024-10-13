@@ -139,7 +139,7 @@
               type="email"
               :id="'emailValue-' + index"
               v-model="email.value"
-              placeholder="Enter email address here"
+              placeholder="Enter an email address here"
               required
               @input="validateEmail(index)"
             />
@@ -276,7 +276,7 @@
               <span
                 class="error"
                 v-if="errors.phones.individualErrors[index].invalid"
-                >{{ getTranslation("errors.phone.invalid") }}</span
+                >{{ getTranslation("errors.phones.invalid") }}</span
               >
             </div>
           </div>
@@ -300,11 +300,11 @@
             </button>
           </div>
         </div>
-
-        <button class="add-new" type="button" @click="addPhone">
-          {{ getTranslation("fieldLabels.phones.btnAddNew") }}
-        </button>
       </div>
+
+      <button class="add-new" type="button" @click="addPhone">
+        {{ getTranslation("fieldLabels.phones.btnAddNew") }}
+      </button>
     </div>
 
     <h3>{{ getTranslation("fieldLabels.addressData") }}</h3>
@@ -634,7 +634,7 @@
     </div>
 
     <button type="button" @click="printJsonInConsole">
-      Print form as Json inside console
+      {{ getTranslation("fieldLabels.btnPrintFormInConsole") }}
     </button>
   </form>
 </template>
@@ -736,7 +736,10 @@ export default {
       translations: {
         en: {
           formTitle: "Registration Form",
+          selectLanguage: "Select a language",
           fieldLabels: {
+            personalData: "Personal Data",
+            addressData: "Address Data",
             firstName: "First name",
             lastName: "Last name",
             birthDate: "Birth date",
@@ -748,6 +751,7 @@ export default {
               primary: "Primary",
               btnAddNew: "Add new email entry",
               btnRemove: "Remove",
+              placeholder: "Enter email address here",
             },
             phones: {
               title: "Phone numbers",
@@ -757,6 +761,7 @@ export default {
               primary: "Primary",
               btnAddNew: "Add new phone entry",
               btnRemove: "Remove",
+              placeholder: "Enter phone number here",
             },
             street: "Street",
             zipCode: "Zip code",
@@ -787,6 +792,7 @@ export default {
           errors: {
             empty: "This field is required and cannot be empty.",
             emails: {
+              invalid: "The entered email is invalid",
               noEntries: "You must enter at least one email.",
               missingType: "You must select a type.",
               moreThan4Other:
@@ -799,6 +805,7 @@ export default {
             phones: {
               invalid: "The entered phone number is invalid.",
               noEntries: "You must enter at least one phone number.",
+              missingType: "You must select a type.",
               moreThan3Other:
                 "You can only select up to 3 phones with type 'Other'",
               noPrimary:
@@ -810,7 +817,10 @@ export default {
         },
         de: {
           formTitle: "Anmeldeformular",
+          selectLanguage: "Wählen Sie eine Sprache",
           fieldLabels: {
+            personalData: "Persönliche Daten",
+            addressData: "Adressdaten",
             firstName: "Vorname",
             lastName: "Nachname",
             birthDate: "Geburtsdatum",
@@ -822,6 +832,7 @@ export default {
               primary: "Primäre",
               btnAddNew: "Neu hinzufügen",
               btnRemove: "Entfernen",
+              placeholder: "E-Mail-Adresse hier eingeben",
             },
             phones: {
               title: "Telefonnummern",
@@ -831,6 +842,7 @@ export default {
               primary: "Primär",
               btnAddNew: "Neu hinzufügen",
               btnRemove: "Entfernen",
+              placeholder: "Geben Sie hier Ihre Telefonnummer ein",
             },
             street: "Straße",
             zipCode: "Postleitzahl",
@@ -862,6 +874,7 @@ export default {
             empty: "Dieses Feld ist erforderlich und darf nicht leer sein.",
             noEntries: "Sie müssen mindestens eine E-Mail eingeben.",
             emails: {
+              invalid: "Die eingegebene E-Mail ist ungültig",
               missingType: "Sie müssen einen Typ auswählen.",
               moreThan4Other:
                 "Sie können nur bis zu 4 E-Mails mit dem Typ 'Other' auswählen.",
