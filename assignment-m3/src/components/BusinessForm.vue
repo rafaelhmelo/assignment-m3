@@ -56,7 +56,7 @@
 
     <div>
       <div v-if="errors.emails.groupedErrors.moreThan4Other">
-        <span>{{ getTranslation("errors.emails.morethan4other") }}</span>
+        <span>{{ getTranslation("errors.emails.moreThan4Other") }}</span>
       </div>
 
       <div v-for="(email, index) in formData.emails" :key="index">
@@ -133,6 +133,10 @@
     </div>
 
     <div>
+      <div v-if="errors.phones.groupedErrors.moreThan3Other">
+        <span>{{ getTranslation("errors.phones.moreThan3Other") }}</span>
+      </div>
+
       <div v-for="(phone, index) in formData.phones" :key="index">
         <div>
           <p>
@@ -143,7 +147,12 @@
         <label :for="'phoneType-' + index"
           >{{ getTranslation("fieldLabels.phones.type") }}:</label
         >
-        <select :id="'phoneType-' + index" v-model="phone.type" required>
+        <select
+          :id="'phoneType-' + index"
+          v-model="phone.type"
+          required
+          @change="validatePhoneType(index)"
+        >
           <option disabled value="">
             {{ getTranslation("selectOptions.phones.placeholder") }}
           </option>
@@ -163,6 +172,11 @@
             {{ getTranslation("selectOptions.phones.other") }}
           </option>
         </select>
+
+        <div v-if="errors.phones.individualErrors[index].missingType">
+          <span>{{ getTranslation("errors.phones.missingType") }}</span>
+        </div>
+
         <label :for="'phoneValue-' + index"
           >{{ getTranslation("fieldLabels.phones.value") }}:</label
         >
@@ -175,11 +189,11 @@
           required
           @input="validatePhoneNumber(index)"
         />
-        <div v-if="errors.phones[index].isVisible">
-          <span v-if="errors.phones[index].empty">{{
+        <div v-if="errors.phones.individualErrors[index].isVisible">
+          <span v-if="errors.phones.individualErrors[index].empty">{{
             getTranslation("errors.empty")
           }}</span>
-          <span v-if="errors.phones[index].invalid">{{
+          <span v-if="errors.phones.individualErrors[index].invalid">{{
             getTranslation("errors.phone.invalid")
           }}</span>
         </div>
@@ -598,16 +612,20 @@ export default {
             },
           ],
         },
-        phones: [
-          {
-            isVisible: false,
-            empty: false,
-            invalid: false,
-            missingType: false,
+        phones: {
+          groupedErrors: {
             missingOnePrimary: false,
             moreThan3Other: false,
           },
-        ],
+          individualErrors: [
+            {
+              isVisible: false,
+              empty: false,
+              invalid: false,
+              missingType: false,
+            },
+          ],
+        },
         street: {
           isVisible: false,
           empty: false,
@@ -685,10 +703,13 @@ export default {
             empty: "This field is required and cannot be empty.",
             emails: {
               missingType: "You must select a type.",
-              morethan4other: "You can only select up to 4 emails with type 'Other'"
+              moreThan4Other:
+                "You can only select up to 4 emails with type 'Other'",
             },
-            phone: {
+            phones: {
               invalid: "The entered phone number is invalid.",
+              moreThan3Other:
+                "You can only select up to 3 phones with type 'Other'",
             },
           },
         },
@@ -718,7 +739,7 @@ export default {
         value: "",
         primary: "",
       });
-      this.errors.phones.push({
+      this.errors.phones.individualErrors.push({
         isVisible: false,
         empty: false,
         invalid: false,
@@ -726,7 +747,7 @@ export default {
     },
     removePhone(index) {
       this.formData.phones.splice(index, 1);
-      this.errors.phones.splice(index, 1);
+      this.errors.phones.individualErrors.splice(index, 1);
     },
     // Validate if a field value is empty. Used only for required fields with no additional validation and fields on the first level of the formData object.
     validateRequired(key) {
@@ -742,16 +763,16 @@ export default {
     },
     validateOtherEmailsLimit() {
       let email;
-      let emailsMarketAsOther = 0;
+      let emailsMarkedAsOther = 0;
 
       for (let i = 0; i < this.formData.emails.length; i++) {
         email = this.formData.emails[i];
         if (email.type == "other") {
-          emailsMarketAsOther++;
+          emailsMarkedAsOther++;
         }
       }
 
-      this.errors.emails.groupedErrors.moreThan4Other = emailsMarketAsOther > 4;
+      this.errors.emails.groupedErrors.moreThan4Other = emailsMarkedAsOther > 4;
     },
     validateEmailType(index) {
       let email = this.formData.emails[index];
@@ -780,22 +801,46 @@ export default {
         this.errors.emails.individualErrors[index].empty ||
         this.errors.emails.individualErrors[index].invalid;
     },
+    validateOtherPhonesLimit() {
+      let phone;
+      let phonesMarkedAsOther = 0;
+
+      for (let i = 0; i < this.formData.phones.length; i++) {
+        phone = this.formData.phones[i];
+        if (phone.type == "other") {
+          phonesMarkedAsOther++;
+        }
+      }
+
+      this.errors.phones.groupedErrors.moreThan3Other = phonesMarkedAsOther > 3;
+    },
+    validatePhoneType(index) {
+      let phone = this.formData.phones[index];
+      this.errors.phones.individualErrors[index].missingType = false;
+
+      if (phone.type == "") {
+        this.errors.phones.individualErrors[index].missingType = true;
+      }
+
+      this.validateOtherPhonesLimit();
+    },
     // Validate a phone number to match the international standard for european phone numbers.
     validatePhoneNumber(index) {
       const regex = /^00[1-9][0-9]{0,2}[1-9][0-9]{6,14}$/;
 
       let phone = this.formData.phones[index];
-      this.errors.phones[index].empty = false;
-      this.errors.phones[index].invalid = false;
+      this.errors.phones.individualErrors[index].empty = false;
+      this.errors.phones.individualErrors[index].invalid = false;
 
       if (phone.value == "") {
-        this.errors.phones[index].empty = true;
+        this.errors.phones.individualErrors[index].empty = true;
       } else if (!regex.test(phone.value)) {
-        this.errors.phones[index].invalid = true;
+        this.errors.phones.individualErrors[index].invalid = true;
       }
 
-      this.errors.phones[index].isVisible =
-        this.errors.phones[index].empty || this.errors.phones[index].invalid;
+      this.errors.phones.individualErrors[index].isVisible =
+        this.errors.phones.individualErrors[index].empty ||
+        this.errors.phones.individualErrors[index].invalid;
     },
     // Given a translation key, return the translated string associated with it for the current language. Otherwise, return the key itself.
     getTranslation(key) {
