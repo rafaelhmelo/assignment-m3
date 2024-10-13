@@ -58,6 +58,12 @@
       <div v-if="errors.emails.groupedErrors.moreThan4Other">
         <span>{{ getTranslation("errors.emails.moreThan4Other") }}</span>
       </div>
+      <div v-if="errors.emails.groupedErrors.noPrimary">
+        <span>{{ getTranslation("errors.emails.noPrimary") }}</span>
+      </div>
+      <div v-if="errors.emails.groupedErrors.tooManyPrimary">
+        <span>{{ getTranslation("errors.emails.tooManyPrimary") }}</span>
+      </div>
 
       <div v-for="(email, index) in formData.emails" :key="index">
         <div>
@@ -122,6 +128,7 @@
           :id="'emailPrimary-' + index"
           v-model="email.primary"
           required
+          @change="validatePrimaryEmail()"
         />
         <button type="button" @click="removeEmail(index)">
           {{ getTranslation("fieldLabels.emails.btnRemove") }}
@@ -135,6 +142,12 @@
     <div>
       <div v-if="errors.phones.groupedErrors.moreThan3Other">
         <span>{{ getTranslation("errors.phones.moreThan3Other") }}</span>
+      </div>
+      <div v-if="errors.phones.groupedErrors.noPrimary">
+        <span>{{ getTranslation("errors.phones.noPrimary") }}</span>
+      </div>
+      <div v-if="errors.phones.groupedErrors.tooManyPrimary">
+        <span>{{ getTranslation("errors.phones.tooManyPrimary") }}</span>
       </div>
 
       <div v-for="(phone, index) in formData.phones" :key="index">
@@ -205,6 +218,7 @@
           :id="'phonePrimary-' + index"
           v-model="phone.primary"
           required
+          @change="validatePrimaryPhone()"
         />
         <button type="button" @click="removePhone(index)">
           {{ getTranslation("fieldLabels.phones.btnRemove") }}
@@ -600,7 +614,8 @@ export default {
         },
         emails: {
           groupedErrors: {
-            missingOnePrimary: false,
+            noPrimary: false,
+            tooManyPrimary: false,
             moreThan4Other: false,
           },
           individualErrors: [
@@ -614,7 +629,8 @@ export default {
         },
         phones: {
           groupedErrors: {
-            missingOnePrimary: false,
+            noPrimary: false,
+            tooManyPrimary: false,
             moreThan3Other: false,
           },
           individualErrors: [
@@ -701,15 +717,25 @@ export default {
           },
           errors: {
             empty: "This field is required and cannot be empty.",
+            noEmails: "You must enter at least one email.",
             emails: {
               missingType: "You must select a type.",
               moreThan4Other:
                 "You can only select up to 4 emails with type 'Other'",
+              noPrimary:
+                "You must select at least one of emails as your Primary one.",
+              tooManyPrimary:
+                "Only one of your email entries must be marked as Primary.",
             },
             phones: {
               invalid: "The entered phone number is invalid.",
+              noPhones: "You must enter at least one phone number.",
               moreThan3Other:
                 "You can only select up to 3 phones with type 'Other'",
+              noPrimary:
+                "You must select at least one of phones as your Primary one.",
+              tooManyPrimary:
+                "Only one of your phone entries must be marked as Primary.",
             },
           },
         },
@@ -761,6 +787,21 @@ export default {
 
       this.errors[key].isVisible = this.errors[key].empty;
     },
+    validatePrimaryEmail() {
+      let email;
+      let primaryEmailsCount = 0;
+
+      for (let i = 0; i < this.formData.emails.length; i++) {
+        email = this.formData.emails[i];
+        if (email.primary) {
+          primaryEmailsCount++;
+        }
+
+        this.errors.emails.groupedErrors.noPrimary = primaryEmailsCount == 0;
+        this.errors.emails.groupedErrors.tooManyPrimary =
+          primaryEmailsCount > 1;
+      }
+    },
     validateOtherEmailsLimit() {
       let email;
       let emailsMarkedAsOther = 0;
@@ -800,6 +841,21 @@ export default {
       this.errors.emails.individualErrors[index].isVisible =
         this.errors.emails.individualErrors[index].empty ||
         this.errors.emails.individualErrors[index].invalid;
+    },
+    validatePrimaryPhone() {
+      let phone;
+      let primaryPhonesCount = 0;
+
+      for (let i = 0; i < this.formData.phones.length; i++) {
+        phone = this.formData.phones[i];
+        if (phone.primary) {
+          primaryPhonesCount++;
+        }
+
+        this.errors.phones.groupedErrors.noPrimary = primaryPhonesCount == 0;
+        this.errors.phones.groupedErrors.tooManyPrimary =
+          primaryPhonesCount > 1;
+      }
     },
     validateOtherPhonesLimit() {
       let phone;
@@ -869,6 +925,7 @@ export default {
       }
 
       for (let i = 0; i < this.formData.phones.length; i++) {
+        this.validatePhoneType(i);
         this.validatePhoneNumber(i);
       }
 
