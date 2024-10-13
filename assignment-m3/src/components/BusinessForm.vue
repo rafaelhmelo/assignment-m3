@@ -119,6 +119,14 @@
           required
           @input="validatePhoneNumber(index)"
         />
+        <div v-if="errors.phones[index].isVisible" style="color: red">
+          <span v-if="errors.phones[index].empty">{{
+            getTranslation("errors.empty")
+          }}</span>
+          <span v-if="errors.phones[index].invalid">{{
+            getTranslation("errors.phone.invalid")
+          }}</span>
+        </div>
         <label :for="'phonePrimary-' + index"
           >{{ getTranslation("fieldLabels.phones.primary") }}:</label
         >
@@ -456,14 +464,19 @@ export default {
         street: "",
         zipCode: "",
         city: "",
-        country: ""
+        country: "",
       },
       errors: {
-        phone: {
-          isVisible: false,
-          empty: false,
-          invalid: false,
-        },
+        firstName: false,
+        lastName: false,
+        birthDate: false,
+        phones: [
+          {
+            isVisible: false,
+            empty: false,
+            invalid: false,
+          },
+        ],
       },
       currentLanguage: "en",
       languages: {
@@ -518,6 +531,12 @@ export default {
               other: "Other",
             },
           },
+          errors: {
+            empty: "This field is required and cannot be empty.",
+            phone: {
+              invalid: "The entered phone number is invalid.",
+            },
+          },
         },
       },
     };
@@ -539,25 +558,32 @@ export default {
         value: "",
         primary: "",
       });
+      this.errors.phones.push({
+        isVisible: false,
+        empty: false,
+        invalid: false
+      });
     },
     removePhone(index) {
       this.formData.phones.splice(index, 1);
+      this.errors.phones.splice(index, 1);
     },
+    // Validate a phone number to match the international standard for european phone numbers.
     validatePhoneNumber(index) {
       const regex = /^00[1-9][0-9]{0,2}[1-9][0-9]{6,14}$/;
-      let phone = this.formData.phones[index];
 
-      if (phone.value) {
-        this.errors.phone.empty = true;
-      } else if (!regex.test(phone)) {
-        this.errors.phone.invalid = true;
-      } else {
-        this.errors.phone.empty = false;
-        this.errors.phone.invalid = false;
+      let phone = this.formData.phones[index];
+      this.errors.phones[index].empty = false;
+      this.errors.phones[index].invalid = false;
+
+      if (phone.value == "") {
+        this.errors.phones[index].empty = true;
+      } else if (!regex.test(phone.value)) {
+        this.errors.phones[index].invalid = true;
       }
 
-      this.errors.phone.isVisible =
-        this.errors.phone.empty || this.errors.phone.invalid;
+      this.errors.phones[index].isVisible =
+        this.errors.phones[index].empty || this.errors.phones[index].invalid;
     },
     // Given a translation key, return the translated string associated with it for the current language. Otherwise, return the key itself.
     getTranslation(key) {
