@@ -2,6 +2,14 @@
   <form>
     <h1>{{ getTranslation("formTitle") }}</h1>
 
+    <select v-model="currentLanguage">
+      <option disabled value="en">
+        {{ getTranslation("selectLanguage") }}
+      </option>
+      <option value="en">English</option>
+      <option value="de">Deutsch</option>
+    </select>
+
     <div>
       <label>{{ getTranslation("fieldLabels.firstName") }}:</label>
       <input
@@ -744,6 +752,81 @@ export default {
                 "You must select at least one of phones as your Primary one.",
               tooManyPrimary:
                 "Only one of your phone entries must be marked as Primary.",
+            },
+          },
+        },
+        de: {
+          formTitle: "Anmeldeformular",
+          fieldLabels: {
+            firstName: "Vorname",
+            lastName: "Nachname",
+            birthDate: "Geburtsdatum",
+            emails: {
+              title: "Email Adressen",
+              titleIndividual: "Email",
+              type: "Typ",
+              value: "Email Adresse",
+              primary: "Primäre",
+              btnAddNew: "Neu hinzufügen",
+              btnRemove: "Entfernen",
+            },
+            phones: {
+              title: "Telefonnummern",
+              titleIndividual: "Telefon",
+              type: "Typ",
+              value: "Telefonnummer",
+              primary: "Primär",
+              btnAddNew: "Neu hinzufügen",
+              btnRemove: "Entfernen",
+            },
+            street: "Straße",
+            zipCode: "Postleitzahl",
+            city: "Stadt",
+            country: "Land",
+            btnPrintFormInConsole:
+              "Formular als Json in der Konsole des Browsers drucken",
+          },
+          selectOptions: {
+            emails: {
+              placeholder: "Wählen Sie einen Typ",
+              business: "Business",
+              private: "Privat",
+              other: "Sonstige",
+            },
+            phones: {
+              placeholder: "Wählen Sie einen Typ",
+              primary: "Primär",
+              mobile: "Mobil",
+              business: "Business",
+              private: "Privat",
+              other: "Sonstige",
+            },
+            countries: {
+              placeholder: "Wählen Sie ein Land",
+            },
+          },
+          errors: {
+            empty: "Dieses Feld ist erforderlich und darf nicht leer sein.",
+            noEntries: "Sie müssen mindestens eine E-Mail eingeben.",
+            emails: {
+              missingType: "Sie müssen einen Typ auswählen.",
+              moreThan4Other:
+                "Sie können nur bis zu 4 E-Mails mit dem Typ 'Other' auswählen.",
+              noPrimary:
+                "Sie müssen mindestens eine der E-Mails als primäre E-Mail auswählen.",
+              tooManyPrimary:
+                "Nur einer Ihrer E-Mail-Einträge darf als primär markiert sein.",
+            },
+            phones: {
+              invalid: "Die eingegebene Telefonnummer ist ungültig.",
+              noEntries: "Sie müssen mindestens eine Telefonnummer eingeben.",
+              missingType: "Sie müssen einen Typ auswählen.",
+              moreThan3Other:
+                "Sie können nur bis zu 3 Telefone mit dem Typ 'Andere' auswählen.",
+              noPrimary:
+                "Sie müssen mindestens eines der Telefone als Ihr primäres Telefon auswählen.",
+              tooManyPrimary:
+                "Nur einer Ihrer Telefoneinträge darf als primär markiert sein.",
             },
           },
         },
