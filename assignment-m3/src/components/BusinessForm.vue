@@ -4,12 +4,36 @@
 
     <div>
       <label>{{ getTranslation("fieldLabels.firstName") }}:</label>
-      <input type="text" required maxlength="50" v-model="formData.firstName" />
+      <input
+        type="text"
+        required
+        maxlength="50"
+        v-model="formData.firstName"
+        @input="validateRequired('firstName')"
+      />
+
+      <div v-if="errors.firstName.isVisible">
+        <span v-if="errors.firstName.empty">{{
+          getTranslation("errors.empty")
+        }}</span>
+      </div>
     </div>
 
     <div>
       <label>{{ getTranslation("fieldLabels.lastName") }}:</label>
-      <input type="text" required maxlength="50" v-model="formData.lastName" />
+      <input
+        type="text"
+        required
+        maxlength="50"
+        v-model="formData.lastName"
+        @input="validateRequired('lastName')"
+      />
+
+      <div v-if="errors.lastName.isVisible">
+        <span v-if="errors.lastName.empty">{{
+          getTranslation("errors.empty")
+        }}</span>
+      </div>
     </div>
 
     <div>
@@ -20,7 +44,14 @@
         maxlength="150"
         v-model="formData.birthDate"
         placeholder="YYYY-mm-dd"
+        @input="validateRequired('birthDate')"
       />
+
+      <div v-if="errors.birthDate.isVisible">
+        <span v-if="errors.birthDate.empty">{{
+          getTranslation("errors.empty")
+        }}</span>
+      </div>
     </div>
 
     <div>
@@ -34,7 +65,12 @@
         <label :for="'emailType-' + index"
           >{{ getTranslation("fieldLabels.emails.type") }}:</label
         >
-        <select :id="'emailType-' + index" v-model="email.type" required>
+        <select
+          :id="'emailType-' + index"
+          v-model="email.type"
+          required
+          @change="validateEmailType(index)"
+        >
           <option disabled value="">
             {{ getTranslation("selectOptions.emails.placeholder") }}
           </option>
@@ -48,6 +84,11 @@
             {{ getTranslation("selectOptions.emails.other") }}
           </option>
         </select>
+
+        <div v-if="errors.emails.individualErrors[index].missingType">
+          <span>{{ getTranslation("errors.emails.missingType") }}</span>
+        </div>
+
         <label :for="'emailValue-' + index"
           >{{ getTranslation("fieldLabels.emails.value") }}:</label
         >
@@ -57,7 +98,18 @@
           v-model="email.value"
           placeholder="Enter email address here"
           required
+          @input="validateEmail(index)"
         />
+
+        <div v-if="errors.emails.individualErrors[index].isVisible">
+          <span v-if="errors.emails.individualErrors[index].empty">{{
+            getTranslation("errors.empty")
+          }}</span>
+          <span v-if="errors.emails.individualErrors[index].invalid">{{
+            getTranslation("errors.emails.invalid")
+          }}</span>
+        </div>
+
         <label :for="'emailPrimary-' + index"
           >{{ getTranslation("fieldLabels.emails.primary") }}:</label
         >
@@ -119,7 +171,7 @@
           required
           @input="validatePhoneNumber(index)"
         />
-        <div v-if="errors.phones[index].isVisible" style="color: red">
+        <div v-if="errors.phones[index].isVisible">
           <span v-if="errors.phones[index].empty">{{
             getTranslation("errors.empty")
           }}</span>
@@ -147,22 +199,65 @@
 
     <div>
       <label>{{ getTranslation("fieldLabels.street") }}:</label>
-      <input type="text" required maxlength="200" v-model="formData.street" />
+      <input
+        type="text"
+        required
+        maxlength="200"
+        v-model="formData.street"
+        @input="validateRequired('street')"
+      />
+
+      <div v-if="errors.street.isVisible">
+        <span v-if="errors.street.empty">{{
+          getTranslation("errors.empty")
+        }}</span>
+      </div>
     </div>
 
     <div>
       <label>{{ getTranslation("fieldLabels.zipCode") }}:</label>
-      <input type="text" required maxlength="20" v-model="formData.zipCode" />
+      <input
+        type="text"
+        required
+        maxlength="20"
+        v-model="formData.zipCode"
+        @input="validateRequired('zipCode')"
+      />
+
+      <div v-if="errors.zipCode.isVisible">
+        <span v-if="errors.zipCode.empty">{{
+          getTranslation("errors.empty")
+        }}</span>
+      </div>
     </div>
 
     <div>
       <label>{{ getTranslation("fieldLabels.city") }}:</label>
-      <input type="text" required maxlength="100" v-model="formData.city" />
+      <input
+        type="text"
+        required
+        maxlength="100"
+        v-model="formData.city"
+        @input="validateRequired('city')"
+      />
+
+      <div v-if="errors.city.isVisible">
+        <span v-if="errors.city.empty">{{
+          getTranslation("errors.empty")
+        }}</span>
+      </div>
     </div>
 
     <div>
       <label>{{ getTranslation("fieldLabels.country") }}:</label>
-      <select required v-model="formData.country">
+      <select
+        required
+        v-model="formData.country"
+        @change="validateRequired('country')"
+      >
+        <option disabled value="">
+          {{ getTranslation("selectOptions.countries.placeholder") }}
+        </option>
         <option value="AF">Afghanistan</option>
         <option value="AX">Åland Islands</option>
         <option value="AL">Albania</option>
@@ -413,6 +508,12 @@
         <option value="ZM">Zambia</option>
         <option value="ZW">Zimbabwe</option>
       </select>
+
+      <div v-if="errors.country.isVisible">
+        <span v-if="errors.country.empty">{{
+          getTranslation("errors.empty")
+        }}</span>
+      </div>
     </div>
 
     <button type="button" @click="printJsonInConsole">
@@ -451,14 +552,14 @@ export default {
           {
             type: "",
             value: "",
-            primary: false,
+            primary: true,
           },
         ],
         phones: [
           {
             type: "",
             value: "",
-            primary: false,
+            primary: true,
           },
         ],
         street: "",
@@ -467,16 +568,58 @@ export default {
         country: "",
       },
       errors: {
-        firstName: false,
-        lastName: false,
-        birthDate: false,
+        firstName: {
+          isVisible: false,
+          empty: false,
+        },
+        lastName: {
+          isVisible: false,
+          empty: false,
+        },
+        birthDate: {
+          isVisible: false,
+          empty: false,
+        },
+        emails: {
+          groupedErrors: {
+            missingOnePrimary: false,
+            moreThan4Other: false,
+          },
+          individualErrors: [
+            {
+              isVisible: false,
+              empty: false,
+              invalid: false,
+              missingType: false,
+            },
+          ],
+        },
         phones: [
           {
             isVisible: false,
             empty: false,
             invalid: false,
+            missingType: false,
+            missingOnePrimary: false,
+            moreThan3Other: false,
           },
         ],
+        street: {
+          isVisible: false,
+          empty: false,
+        },
+        zipCode: {
+          isVisible: false,
+          empty: false,
+        },
+        city: {
+          isVisible: false,
+          empty: false,
+        },
+        country: {
+          isVisible: false,
+          empty: false,
+        },
       },
       currentLanguage: "en",
       languages: {
@@ -530,9 +673,15 @@ export default {
               private: "Private",
               other: "Other",
             },
+            countries: {
+              placeholder: "Select a country",
+            },
           },
           errors: {
             empty: "This field is required and cannot be empty.",
+            emails: {
+              missingType: "You must select a type.",
+            },
             phone: {
               invalid: "The entered phone number is invalid.",
             },
@@ -548,9 +697,15 @@ export default {
         value: "",
         primary: "",
       });
+      this.errors.emails.individualErrors.push({
+        isVisible: false,
+        empty: false,
+        invalid: false,
+      });
     },
     removeEmail(index) {
       this.formData.emails.splice(index, 1);
+      this.errors.emails.individualErrors.splice(index, 1);
     },
     addPhone() {
       this.formData.phones.push({
@@ -561,12 +716,49 @@ export default {
       this.errors.phones.push({
         isVisible: false,
         empty: false,
-        invalid: false
+        invalid: false,
       });
     },
     removePhone(index) {
       this.formData.phones.splice(index, 1);
       this.errors.phones.splice(index, 1);
+    },
+    // Validate if a field value is empty. Used only for required fields with no additional validation and fields on the first level of the formData object.
+    validateRequired(key) {
+      let value = this.formData[key];
+
+      this.errors[key].empty = false;
+
+      if (value == "") {
+        this.errors[key].empty = true;
+      }
+
+      this.errors[key].isVisible = this.errors[key].empty;
+    },
+    validateEmailType(index) {
+      let email = this.formData.emails[index];
+      this.errors.emails.individualErrors[index].missingType = false;
+
+      if (email.type == "") {
+        this.errors.emails.individualErrors[index].missingType = true;
+      }
+    },
+    validateEmail(index) {
+      const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+      let email = this.formData.emails[index];
+      this.errors.emails.individualErrors[index].empty = false;
+      this.errors.emails.individualErrors[index].invalid = false;
+
+      if (email.value == "") {
+        this.errors.emails.individualErrors[index].empty = true;
+      } else if (!regex.test(email.value)) {
+        this.errors.emails.individualErrors[index].invalid = true;
+      }
+
+      this.errors.emails.individualErrors[index].isVisible =
+        this.errors.emails.individualErrors[index].empty ||
+        this.errors.emails.individualErrors[index].invalid;
     },
     // Validate a phone number to match the international standard for european phone numbers.
     validatePhoneNumber(index) {
@@ -601,7 +793,27 @@ export default {
       }
       return translationObject;
     },
+    validateWholeForm() {
+      this.validateRequired("firstName");
+      this.validateRequired("lastName");
+      this.validateRequired("birthDate");
+
+      for (let i = 0; i < this.formData.emails.length; i++) {
+        this.validateEmailType(i);
+        this.validateEmail(i);
+      }
+
+      for (let i = 0; i < this.formData.phones.length; i++) {
+        this.validatePhoneNumber(i);
+      }
+
+      this.validateRequired("street");
+      this.validateRequired("zipCode");
+      this.validateRequired("city");
+      this.validateRequired("country");
+    },
     printJsonInConsole() {
+      this.validateWholeForm();
       let jsonData = JSON.stringify(this.$data.formData, null, 2);
       console.log(jsonData);
     },
