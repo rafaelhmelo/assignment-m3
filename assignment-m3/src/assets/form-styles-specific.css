@@ -1,0 +1,56 @@
+body {
+}
+
+.form {
+    max-width: 1280px;
+    margin: auto;
+    background-color: #eee;
+    border-radius: 15px;
+    padding: 48px 24px;
+}
+
+.language-selector {
+    margin-bottom: 48px;
+}
+
+.personal-data {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding-bottom: 48px;
+}
+
+.address-data {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding-bottom: 48px;
+}
+
+.list-entry {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    max-width: 600px;
+    padding: 16px 0;
+    margin: 0 auto 16px auto;
+    background-color: #ddd;
+}
+
+.add-new {
+    margin: 16px 0;
+}
+
+.list-entry-type, .list-entry-value, .list-entry-primary, .list-entry-remove-action {
+    margin-bottom: 16px;
+}
+
+label {
+    margin-right: 16px;
+}
+
+.error {
+    color: red;
+}
