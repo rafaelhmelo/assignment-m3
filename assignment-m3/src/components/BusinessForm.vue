@@ -1,16 +1,19 @@
 <template>
-  <form @submit.prevent="submitForm">
-    <h1>Registration Form</h1>
+  <form>
+    <h1>{{ getTranslation('formTitle') }}</h1>
+
     <div>
-      <label>First Name:</label>
+      <label>{{ getTranslation('fieldLabels.firstName') }}:</label>
       <input type="text" required maxlength="50" v-model="firstName" />
     </div>
+
     <div>
-      <label>Last Name:</label>
+      <label>{{ getTranslation('fieldLabels.lastName') }}:</label>
       <input type="text" required maxlength="50" v-model="lastName" />
     </div>
+
     <div>
-      <label>Birth Date:</label>
+      <label>{{ getTranslation('fieldLabels.birthDate') }}:</label>
       <input
         type="date"
         required
@@ -19,19 +22,20 @@
         placeholder="YYYY-mm-dd"
       />
     </div>
+
     <div>
       <div v-for="(email, index) in emails" :key="index">
         <div>
-          <p>Email {{ index + 1 }}:</p>
+          <p>{{ getTranslation('fieldLabels.emails.titleIndividual') }} {{ index + 1 }}:</p>
         </div>
-        <label :for="'emailType-' + index">Type:</label>
+        <label :for="'emailType-' + index">{{ getTranslation('fieldLabels.emails.type') }}:</label>
         <select :id="'emailType-' + index" v-model="email.type" required>
-          <option disabled value="">Select a Type</option>
-          <option value="business">Business</option>
-          <option value="private">Private</option>
-          <option value="other">Other</option>
+          <option disabled value="">{{ getTranslation('selectOptions.emails.placeholder') }}</option>
+          <option value="business">{{ getTranslation('selectOptions.emails.business') }}</option>
+          <option value="private">{{ getTranslation('selectOptions.emails.private') }}</option>
+          <option value="other">{{ getTranslation('selectOptions.emails.other') }}</option>
         </select>
-        <label :for="'emailValue-' + index">Email Address:</label>
+        <label :for="'emailValue-' + index">{{ getTranslation('fieldLabels.emails.value') }}:</label>
         <input
           type="email"
           :id="'emailValue-' + index"
@@ -39,32 +43,33 @@
           placeholder="Enter email address here"
           required
         />
-        <label :for="'emailPrimary-' + index">Primary:</label>
+        <label :for="'emailPrimary-' + index">{{ getTranslation('fieldLabels.emails.primary') }}:</label>
         <input
           type="checkbox"
           :id="'emailPrimary-' + index"
           v-model="email.primary"
           required
         />
-        <button type="button" @click="removeEmail(index)">Remove</button>
+        <button type="button" @click="removeEmail(index)">{{ getTranslation('fieldLabels.emails.btnRemove') }}</button>
       </div>
-      <button type="button" @click="addEmail">Add Email</button>
+      <button type="button" @click="addEmail">{{ getTranslation('fieldLabels.emails.btnAddNew') }}</button>
     </div>
+
     <div>
       <div v-for="(phone, index) in phones" :key="index">
         <div>
-          <p>Phone {{ index + 1 }}:</p>
+          <p>{{ getTranslation('fieldLabels.phones.titleIndividual') }} {{ index + 1 }}:</p>
         </div>
-        <label :for="'phoneType-' + index">Type:</label>
+        <label :for="'phoneType-' + index">{{ getTranslation('fieldLabels.phones.type') }}:</label>
         <select :id="'phoneType-' + index" v-model="phone.type" required>
-          <option disabled value="">Select a Type</option>
-          <option value="primary">Primary</option>
-          <option value="mobile">Mobile</option>
-          <option value="business">Business</option>
-          <option value="private">Private</option>
-          <option value="other">Other</option>
+          <option disabled value="">{{ getTranslation('selectOptions.phones.placeholder') }}</option>
+          <option value="primary">{{ getTranslation('selectOptions.phones.primary') }}</option>
+          <option value="mobile">{{ getTranslation('selectOptions.phones.mobile') }}</option>
+          <option value="business">{{ getTranslation('selectOptions.phones.business') }}</option>
+          <option value="private">{{ getTranslation('selectOptions.phones.private') }}</option>
+          <option value="other">{{ getTranslation('selectOptions.phones.other') }}</option>
         </select>
-        <label :for="'phoneValue-' + index">Phone Number:</label>
+        <label :for="'phoneValue-' + index">{{ getTranslation('fieldLabels.phones.value') }}:</label>
         <input
           type="tel"
           :id="'phoneValue-' + index"
@@ -72,32 +77,37 @@
           placeholder="Enter phone number here"
           pattern="^00[1-9][0-9]{0,2}[1-9][0-9]{6,14}$"
           required
+          @input="validatePhone(index)"
         />
-        <label :for="'phonePrimary-' + index">Primary:</label>
+        <label :for="'phonePrimary-' + index">{{ getTranslation('fieldLabels.phones.primary') }}:</label>
         <input
           type="checkbox"
           :id="'phonePrimary-' + index"
           v-model="phone.primary"
           required
         />
-        <button type="button" @click="removePhone(index)">Remove</button>
+        <button type="button" @click="removePhone(index)">{{ getTranslation('fieldLabels.phones.btnRemove') }}</button>
       </div>
-      <button type="button" @click="addPhone">Add Phone</button>
+      <button type="button" @click="addPhone">{{ getTranslation('fieldLabels.phones.btnAddNew') }}</button>
     </div>
+
     <div>
-      <label>Street:</label>
+      <label>{{ getTranslation('fieldLabels.street') }}:</label>
       <input type="text" required maxlength="200" v-model="street" />
     </div>
+
     <div>
-      <label>Zip Code:</label>
+      <label>{{ getTranslation('fieldLabels.zipCode') }}:</label>
       <input type="text" required maxlength="20" v-model="zipCode" />
     </div>
+
     <div>
-      <label>City:</label>
+      <label>{{ getTranslation('fieldLabels.city') }}:</label>
       <input type="text" required maxlength="100" v-model="city" />
     </div>
+
     <div>
-      <label>Country:</label>
+      <label>{{ getTranslation('fieldLabels.country') }}:</label>
       <select required v-model="country">
         <option value="AF">Afghanistan</option>
         <option value="AX">Åland Islands</option>
@@ -354,7 +364,6 @@
     <button type="button" @click="printJsonInConsole">
       Print form as Json inside console
     </button>
-    <button type="submit">Submit Form</button>
   </form>
 
   <p>First Name: {{ firstName }}</p>
@@ -401,6 +410,67 @@ export default {
       zipCode: "",
       city: "",
       country: "",
+      errors: {
+        phone: {
+            isVisible: false,
+            empty: false,
+            invalid: false
+        }
+      },
+      currentLanguage: "en",
+      languages: {
+        en: "English",
+        de: "German"
+      },
+      translations: {
+        en: {
+            formTitle: "Registration Form",
+            fieldLabels: {
+                firstName: "First name",
+                lastName: "Last name",
+                birthDate: "Birth date",
+                emails: {
+                    title: "Email addresses",
+                    titleIndividual: "Email",
+                    type: "Type",
+                    value: "Email address",
+                    primary: "Primary",
+                    btnAddNew: "Add New",
+                    btnRemove: "Remove"
+                },
+                phones: {
+                    title: "Phone numbers",
+                    titleIndividual: "Phone",
+                    type: "Type",
+                    value: "Phone number",
+                    primary: "Primary",
+                    btnAddNew: "Add New",
+                    btnRemove: "Remove"
+                },
+                street: "Street",
+                zipCode: "Zip code",
+                city: "City",
+                country: "Country",
+                btnPrintFormInConsole: "Print form as Json inside the browser's console"
+            },
+            selectOptions: {
+                emails: {
+                    placeholder: "Select a Type",
+                    business: "Business",
+                    private: "Private",
+                    other: "Other"
+                },
+                phones: {
+                    placeholder: "Select a Type",
+                    primary: "Primary",
+                    mobile: "Mobile",
+                    business: "Business",
+                    private: "Private",
+                    other: "Other"
+                }
+            }
+        }
+      }
     };
   },
   methods: {
@@ -424,8 +494,41 @@ export default {
     removePhone(index) {
       this.phones.splice(index, 1);
     },
+    validatePhoneNumber(index) {
+        const regex = /^00[1-9][0-9]{0,2}[1-9][0-9]{6,14}$/;
+        let phone = this.phones[index];
+
+        if(phone.value) {
+            this.errors.phone.empty = true;
+        }
+        else if(!regex.test(phone)) {
+            this.errors.phone.invalid = true;
+        }
+        else {
+            this.errors.phone.empty = false;
+            this.errors.phone.invalid = false;
+        }
+
+        this.errors.phone.isVisible = this.errors.phone.empty || this.errors.phone.invalid
+    },
+    // Given a translation key, return the translated string associated with it for the current language. Otherwise, return the key itself.
+    getTranslation(key) {
+        const keys = key.split('.');
+        let translationObject = this.translations[this.currentLanguage];
+
+        // Iterate inside the translations array to find a specific key
+        for(const keyFragment of keys) {
+            if(keyFragment in translationObject) {
+                translationObject = translationObject[keyFragment];
+            }
+            else { // If a translation wasn't found, return the key itself. It's better than returning an empty string.
+                return key;
+            }
+        }
+        return translationObject;
+    },
     printJsonInConsole() {
-      let jsonData = JSON.stringify(this.$data, null, 2);
+      let jsonData = JSON.stringify(this.$data.formData, null, 2);
       console.log(jsonData);
     },
     submitForm() {
