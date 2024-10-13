@@ -1,41 +1,56 @@
 <template>
   <form>
-    <h1>{{ getTranslation('formTitle') }}</h1>
+    <h1>{{ getTranslation("formTitle") }}</h1>
 
     <div>
-      <label>{{ getTranslation('fieldLabels.firstName') }}:</label>
-      <input type="text" required maxlength="50" v-model="firstName" />
+      <label>{{ getTranslation("fieldLabels.firstName") }}:</label>
+      <input type="text" required maxlength="50" v-model="formData.firstName" />
     </div>
 
     <div>
-      <label>{{ getTranslation('fieldLabels.lastName') }}:</label>
-      <input type="text" required maxlength="50" v-model="lastName" />
+      <label>{{ getTranslation("fieldLabels.lastName") }}:</label>
+      <input type="text" required maxlength="50" v-model="formData.lastName" />
     </div>
 
     <div>
-      <label>{{ getTranslation('fieldLabels.birthDate') }}:</label>
+      <label>{{ getTranslation("fieldLabels.birthDate") }}:</label>
       <input
         type="date"
         required
         maxlength="150"
-        v-model="birthDate"
+        v-model="formData.birthDate"
         placeholder="YYYY-mm-dd"
       />
     </div>
 
     <div>
-      <div v-for="(email, index) in emails" :key="index">
+      <div v-for="(email, index) in formData.emails" :key="index">
         <div>
-          <p>{{ getTranslation('fieldLabels.emails.titleIndividual') }} {{ index + 1 }}:</p>
+          <p>
+            {{ getTranslation("fieldLabels.emails.titleIndividual") }}
+            {{ index + 1 }}:
+          </p>
         </div>
-        <label :for="'emailType-' + index">{{ getTranslation('fieldLabels.emails.type') }}:</label>
+        <label :for="'emailType-' + index"
+          >{{ getTranslation("fieldLabels.emails.type") }}:</label
+        >
         <select :id="'emailType-' + index" v-model="email.type" required>
-          <option disabled value="">{{ getTranslation('selectOptions.emails.placeholder') }}</option>
-          <option value="business">{{ getTranslation('selectOptions.emails.business') }}</option>
-          <option value="private">{{ getTranslation('selectOptions.emails.private') }}</option>
-          <option value="other">{{ getTranslation('selectOptions.emails.other') }}</option>
+          <option disabled value="">
+            {{ getTranslation("selectOptions.emails.placeholder") }}
+          </option>
+          <option value="business">
+            {{ getTranslation("selectOptions.emails.business") }}
+          </option>
+          <option value="private">
+            {{ getTranslation("selectOptions.emails.private") }}
+          </option>
+          <option value="other">
+            {{ getTranslation("selectOptions.emails.other") }}
+          </option>
         </select>
-        <label :for="'emailValue-' + index">{{ getTranslation('fieldLabels.emails.value') }}:</label>
+        <label :for="'emailValue-' + index"
+          >{{ getTranslation("fieldLabels.emails.value") }}:</label
+        >
         <input
           type="email"
           :id="'emailValue-' + index"
@@ -43,33 +58,58 @@
           placeholder="Enter email address here"
           required
         />
-        <label :for="'emailPrimary-' + index">{{ getTranslation('fieldLabels.emails.primary') }}:</label>
+        <label :for="'emailPrimary-' + index"
+          >{{ getTranslation("fieldLabels.emails.primary") }}:</label
+        >
         <input
           type="checkbox"
           :id="'emailPrimary-' + index"
           v-model="email.primary"
           required
         />
-        <button type="button" @click="removeEmail(index)">{{ getTranslation('fieldLabels.emails.btnRemove') }}</button>
+        <button type="button" @click="removeEmail(index)">
+          {{ getTranslation("fieldLabels.emails.btnRemove") }}
+        </button>
       </div>
-      <button type="button" @click="addEmail">{{ getTranslation('fieldLabels.emails.btnAddNew') }}</button>
+      <button type="button" @click="addEmail">
+        {{ getTranslation("fieldLabels.emails.btnAddNew") }}
+      </button>
     </div>
 
     <div>
-      <div v-for="(phone, index) in phones" :key="index">
+      <div v-for="(phone, index) in formData.phones" :key="index">
         <div>
-          <p>{{ getTranslation('fieldLabels.phones.titleIndividual') }} {{ index + 1 }}:</p>
+          <p>
+            {{ getTranslation("fieldLabels.phones.titleIndividual") }}
+            {{ index + 1 }}:
+          </p>
         </div>
-        <label :for="'phoneType-' + index">{{ getTranslation('fieldLabels.phones.type') }}:</label>
+        <label :for="'phoneType-' + index"
+          >{{ getTranslation("fieldLabels.phones.type") }}:</label
+        >
         <select :id="'phoneType-' + index" v-model="phone.type" required>
-          <option disabled value="">{{ getTranslation('selectOptions.phones.placeholder') }}</option>
-          <option value="primary">{{ getTranslation('selectOptions.phones.primary') }}</option>
-          <option value="mobile">{{ getTranslation('selectOptions.phones.mobile') }}</option>
-          <option value="business">{{ getTranslation('selectOptions.phones.business') }}</option>
-          <option value="private">{{ getTranslation('selectOptions.phones.private') }}</option>
-          <option value="other">{{ getTranslation('selectOptions.phones.other') }}</option>
+          <option disabled value="">
+            {{ getTranslation("selectOptions.phones.placeholder") }}
+          </option>
+          <option value="primary">
+            {{ getTranslation("selectOptions.phones.primary") }}
+          </option>
+          <option value="mobile">
+            {{ getTranslation("selectOptions.phones.mobile") }}
+          </option>
+          <option value="business">
+            {{ getTranslation("selectOptions.phones.business") }}
+          </option>
+          <option value="private">
+            {{ getTranslation("selectOptions.phones.private") }}
+          </option>
+          <option value="other">
+            {{ getTranslation("selectOptions.phones.other") }}
+          </option>
         </select>
-        <label :for="'phoneValue-' + index">{{ getTranslation('fieldLabels.phones.value') }}:</label>
+        <label :for="'phoneValue-' + index"
+          >{{ getTranslation("fieldLabels.phones.value") }}:</label
+        >
         <input
           type="tel"
           :id="'phoneValue-' + index"
@@ -77,38 +117,44 @@
           placeholder="Enter phone number here"
           pattern="^00[1-9][0-9]{0,2}[1-9][0-9]{6,14}$"
           required
-          @input="validatePhone(index)"
+          @input="validatePhoneNumber(index)"
         />
-        <label :for="'phonePrimary-' + index">{{ getTranslation('fieldLabels.phones.primary') }}:</label>
+        <label :for="'phonePrimary-' + index"
+          >{{ getTranslation("fieldLabels.phones.primary") }}:</label
+        >
         <input
           type="checkbox"
           :id="'phonePrimary-' + index"
           v-model="phone.primary"
           required
         />
-        <button type="button" @click="removePhone(index)">{{ getTranslation('fieldLabels.phones.btnRemove') }}</button>
+        <button type="button" @click="removePhone(index)">
+          {{ getTranslation("fieldLabels.phones.btnRemove") }}
+        </button>
       </div>
-      <button type="button" @click="addPhone">{{ getTranslation('fieldLabels.phones.btnAddNew') }}</button>
+      <button type="button" @click="addPhone">
+        {{ getTranslation("fieldLabels.phones.btnAddNew") }}
+      </button>
     </div>
 
     <div>
-      <label>{{ getTranslation('fieldLabels.street') }}:</label>
-      <input type="text" required maxlength="200" v-model="street" />
+      <label>{{ getTranslation("fieldLabels.street") }}:</label>
+      <input type="text" required maxlength="200" v-model="formData.street" />
     </div>
 
     <div>
-      <label>{{ getTranslation('fieldLabels.zipCode') }}:</label>
-      <input type="text" required maxlength="20" v-model="zipCode" />
+      <label>{{ getTranslation("fieldLabels.zipCode") }}:</label>
+      <input type="text" required maxlength="20" v-model="formData.zipCode" />
     </div>
 
     <div>
-      <label>{{ getTranslation('fieldLabels.city') }}:</label>
-      <input type="text" required maxlength="100" v-model="city" />
+      <label>{{ getTranslation("fieldLabels.city") }}:</label>
+      <input type="text" required maxlength="100" v-model="formData.city" />
     </div>
 
     <div>
-      <label>{{ getTranslation('fieldLabels.country') }}:</label>
-      <select required v-model="country">
+      <label>{{ getTranslation("fieldLabels.country") }}:</label>
+      <select required v-model="formData.country">
         <option value="AF">Afghanistan</option>
         <option value="AX">Åland Islands</option>
         <option value="AL">Albania</option>
@@ -366,166 +412,168 @@
     </button>
   </form>
 
-  <p>First Name: {{ firstName }}</p>
-  <p>Last Name: {{ lastName }}</p>
-  <p>Birth Date: {{ birthDate }}</p>
+  <p>First Name: {{ formData.firstName }}</p>
+  <p>Last Name: {{ formData.lastName }}</p>
+  <p>Birth Date: {{ formData.birthDate }}</p>
   <div>
-    <div v-for="(email, index) in emails" :key="index">
+    <div v-for="(email, index) in formData.emails" :key="index">
       {{ email }}
     </div>
   </div>
   <div>
-    <div v-for="(phone, index) in phones" :key="index">
+    <div v-for="(phone, index) in formData.phones" :key="index">
       {{ phone }}
     </div>
   </div>
-  <p>Street: {{ street }}</p>
-  <p>Zip Code: {{ zipCode }}</p>
-  <p>City: {{ city }}</p>
-  <p>Country: {{ country }}</p>
+  <p>Street: {{ formData.street }}</p>
+  <p>Zip Code: {{ formData.zipCode }}</p>
+  <p>City: {{ formData.city }}</p>
+  <p>Country: {{ formData.country }}</p>
 </template>
 
 <script>
 export default {
   data() {
     return {
-      firstName: "",
-      lastName: "",
-      birthDate: "",
-      emails: [
-        {
-          type: "",
-          value: "",
-          primary: false,
-        },
-      ],
-      phones: [
-        {
-          type: "",
-          value: "",
-          primary: false,
-        },
-      ],
-      street: "",
-      zipCode: "",
-      city: "",
-      country: "",
+      formData: {
+        firstName: "",
+        lastName: "",
+        birthDate: "",
+        emails: [
+          {
+            type: "",
+            value: "",
+            primary: false,
+          },
+        ],
+        phones: [
+          {
+            type: "",
+            value: "",
+            primary: false,
+          },
+        ],
+        street: "",
+        zipCode: "",
+        city: "",
+        country: ""
+      },
       errors: {
         phone: {
-            isVisible: false,
-            empty: false,
-            invalid: false
-        }
+          isVisible: false,
+          empty: false,
+          invalid: false,
+        },
       },
       currentLanguage: "en",
       languages: {
         en: "English",
-        de: "German"
+        de: "German",
       },
       translations: {
         en: {
-            formTitle: "Registration Form",
-            fieldLabels: {
-                firstName: "First name",
-                lastName: "Last name",
-                birthDate: "Birth date",
-                emails: {
-                    title: "Email addresses",
-                    titleIndividual: "Email",
-                    type: "Type",
-                    value: "Email address",
-                    primary: "Primary",
-                    btnAddNew: "Add New",
-                    btnRemove: "Remove"
-                },
-                phones: {
-                    title: "Phone numbers",
-                    titleIndividual: "Phone",
-                    type: "Type",
-                    value: "Phone number",
-                    primary: "Primary",
-                    btnAddNew: "Add New",
-                    btnRemove: "Remove"
-                },
-                street: "Street",
-                zipCode: "Zip code",
-                city: "City",
-                country: "Country",
-                btnPrintFormInConsole: "Print form as Json inside the browser's console"
+          formTitle: "Registration Form",
+          fieldLabels: {
+            firstName: "First name",
+            lastName: "Last name",
+            birthDate: "Birth date",
+            emails: {
+              title: "Email addresses",
+              titleIndividual: "Email",
+              type: "Type",
+              value: "Email address",
+              primary: "Primary",
+              btnAddNew: "Add New",
+              btnRemove: "Remove",
             },
-            selectOptions: {
-                emails: {
-                    placeholder: "Select a Type",
-                    business: "Business",
-                    private: "Private",
-                    other: "Other"
-                },
-                phones: {
-                    placeholder: "Select a Type",
-                    primary: "Primary",
-                    mobile: "Mobile",
-                    business: "Business",
-                    private: "Private",
-                    other: "Other"
-                }
-            }
-        }
-      }
+            phones: {
+              title: "Phone numbers",
+              titleIndividual: "Phone",
+              type: "Type",
+              value: "Phone number",
+              primary: "Primary",
+              btnAddNew: "Add New",
+              btnRemove: "Remove",
+            },
+            street: "Street",
+            zipCode: "Zip code",
+            city: "City",
+            country: "Country",
+            btnPrintFormInConsole:
+              "Print form as Json inside the browser's console",
+          },
+          selectOptions: {
+            emails: {
+              placeholder: "Select a Type",
+              business: "Business",
+              private: "Private",
+              other: "Other",
+            },
+            phones: {
+              placeholder: "Select a Type",
+              primary: "Primary",
+              mobile: "Mobile",
+              business: "Business",
+              private: "Private",
+              other: "Other",
+            },
+          },
+        },
+      },
     };
   },
   methods: {
     addEmail() {
-      this.emails.push({
+      this.formData.emails.push({
         type: "",
         value: "",
         primary: "",
       });
     },
     removeEmail(index) {
-      this.emails.splice(index, 1);
+      this.formData.emails.splice(index, 1);
     },
     addPhone() {
-      this.phones.push({
+      this.formData.phones.push({
         type: "",
         value: "",
         primary: "",
       });
     },
     removePhone(index) {
-      this.phones.splice(index, 1);
+      this.formData.phones.splice(index, 1);
     },
     validatePhoneNumber(index) {
-        const regex = /^00[1-9][0-9]{0,2}[1-9][0-9]{6,14}$/;
-        let phone = this.phones[index];
+      const regex = /^00[1-9][0-9]{0,2}[1-9][0-9]{6,14}$/;
+      let phone = this.formData.phones[index];
 
-        if(phone.value) {
-            this.errors.phone.empty = true;
-        }
-        else if(!regex.test(phone)) {
-            this.errors.phone.invalid = true;
-        }
-        else {
-            this.errors.phone.empty = false;
-            this.errors.phone.invalid = false;
-        }
+      if (phone.value) {
+        this.errors.phone.empty = true;
+      } else if (!regex.test(phone)) {
+        this.errors.phone.invalid = true;
+      } else {
+        this.errors.phone.empty = false;
+        this.errors.phone.invalid = false;
+      }
 
-        this.errors.phone.isVisible = this.errors.phone.empty || this.errors.phone.invalid
+      this.errors.phone.isVisible =
+        this.errors.phone.empty || this.errors.phone.invalid;
     },
     // Given a translation key, return the translated string associated with it for the current language. Otherwise, return the key itself.
     getTranslation(key) {
-        const keys = key.split('.');
-        let translationObject = this.translations[this.currentLanguage];
+      const keys = key.split(".");
+      let translationObject = this.translations[this.currentLanguage];
 
-        // Iterate inside the translations array to find a specific key
-        for(const keyFragment of keys) {
-            if(keyFragment in translationObject) {
-                translationObject = translationObject[keyFragment];
-            }
-            else { // If a translation wasn't found, return the key itself. It's better than returning an empty string.
-                return key;
-            }
+      // Iterate inside the translations array to find a specific key
+      for (const keyFragment of keys) {
+        if (keyFragment in translationObject) {
+          translationObject = translationObject[keyFragment];
+        } else {
+          // If a translation wasn't found, return the key itself. It's better than returning an empty string.
+          return key;
         }
-        return translationObject;
+      }
+      return translationObject;
     },
     printJsonInConsole() {
       let jsonData = JSON.stringify(this.$data.formData, null, 2);
