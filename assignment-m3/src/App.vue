@@ -1,14 +1,17 @@
 <template>
   <BusinessForm />
+  <AcmeMusicTariffCard />
 </template>
 
 <script>
 import BusinessForm from "./components/BusinessForm.vue";
+import AcmeMusicTariffCard from "./components/AcmeMusicTariffCard.vue";
 
 export default {
   name: "App",
   components: {
     BusinessForm,
+    AcmeMusicTariffCard
   },
 };
 </script>
